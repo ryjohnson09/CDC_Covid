@@ -1,0 +1,88 @@
+---
+title: "Covid Analysis"
+format: 
+  html:
+    fig-width: 5
+    fig-height: 3
+---
+
+```{python}
+#| echo: false
+#| output: false
+import duckdb
+import pandas as pd
+import json
+
+# Connect to the DuckDB database
+conn = duckdb.connect(database="/data/duckdb/database/demo-datasets.db", read_only=False)
+
+# Create a cursor object to execute SQL queries
+cursor = conn.cursor()
+
+# Execute a query to select data from the table
+cursor.execute("SELECT * FROM covid")
+
+# Fetch the results into a pandas DataFrame
+df = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
+
+# Convert to date
+df['date'] = pd.to_datetime(df['date'])
+
+# Specify the specific date to filter for
+specific_date = '2022-03-07'
+
+# Filter the DataFrame for the specific date
+filtered_df = df[df['date'] == specific_date]
+
+# Add 1 to all values (for log transforming)
+filtered_df['new_cases1'] = filtered_df.new_cases + 1
+
+# Transform to json
+data_dict = filtered_df.set_index('province_state')['new_cases1'].to_dict()
+
+# Convert the dictionary to JSON format
+state_values = {province_state: new_cases1 for province_state, new_cases1 in data_dict.items()}
+
+
+# Don't forget to close the connection when done
+conn.close()
+```
+
+
+```{python}
+#| fig-align: center
+#| echo: false
+import geopandas as gpd
+import matplotlib
+import matplotlib.pyplot as plt
+import json
+
+# Load the US States shapefile
+map_df = gpd.read_file("cb_2018_us_state_20m.shp")
+
+# Filter out OCONUS state/povinces
+map_df = map_df[~map_df['STUSPS'].isin(['AK', 'HI'])]
+
+# Merge the numerical values with the shapefile
+map_df['value'] = map_df['NAME'].map(state_values)
+
+
+# Plotting
+fig, ax = plt.subplots(1, 1, figsize=(15, 10))
+map_df.plot(column='value', cmap='OrRd', linewidth=0.8, ax=ax, edgecolor='0.8', legend=True, norm=matplotlib.colors.LogNorm(vmin=filtered_df.new_cases1.min(), vmax=filtered_df.new_cases1.max()))
+
+
+# Remove the box around the plot
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.axis('off')
+
+plt.title('New Covid Cases')
+
+# Set the size of the current figure
+plt.gcf().set_size_inches(7, 5)
+
+plt.show()
+```

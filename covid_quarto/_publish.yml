@@ -1,0 +1,4 @@
+- source: covid-analysis.qmd
+  connect:
+    - id: 0fcbf73b-5281-46d6-8c5a-6d3fd900ce90
+      url: 'https://soft-labradoodle.staging.eval.posit.co/pub/content/0fcbf73b-5281-46d6-8c5a-6d3fd900ce90/'

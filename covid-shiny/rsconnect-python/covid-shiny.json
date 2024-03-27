@@ -1,0 +1,12 @@
+{
+    "https://soft-labradoodle.staging.eval.posit.co/pub": {
+        "server_url": "https://soft-labradoodle.staging.eval.posit.co/pub",
+        "filename": "/home/publisher1/CDC-covid/covid-shiny",
+        "app_url": "https://soft-labradoodle.staging.eval.posit.co/pub/content/39f7ba13-6760-4d6d-9fc1-a90ac648aee0/",
+        "app_id": "39f7ba13-6760-4d6d-9fc1-a90ac648aee0",
+        "app_guid": "39f7ba13-6760-4d6d-9fc1-a90ac648aee0",
+        "title": "covid-shiny",
+        "app_mode": "python-shiny",
+        "app_store_version": 1
+    }
+}
